@@ -2,8 +2,10 @@ package com.github.skiflok.productservice.service;
 
 
 import com.github.skiflok.productservice.dto.ProductRequest;
+import com.github.skiflok.productservice.dto.ProductResponse;
 import com.github.skiflok.productservice.model.Product;
 import com.github.skiflok.productservice.repository.ProductRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,20 @@ public class ProductService {
     productRepository.save(product);
     log.info("Product {} is saved", product.getId());
 
+  }
+
+  public List<ProductResponse> getAllProduct() {
+    return productRepository.findAll().stream()
+        .map(this::productToProductResponse)
+        .toList();
+  }
+  public ProductResponse productToProductResponse(Product product){
+    return          ProductResponse.builder()
+        .id(product.getId())
+        .name(product.getName())
+        .description(product.getDescription())
+        .price(product.getPrice())
+        .build();
   }
 
 }
