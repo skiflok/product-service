@@ -1,31 +1,27 @@
 package com.github.skiflok.orderservice.model;
 
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "order_line_items")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
-
+public class OrderLineItems {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String orderNumber;
-  @OneToMany(cascade = CascadeType.ALL)
-  private List<OrderLineItems> orderLineItems;
+  private String scuCode;
+  private BigDecimal price;
+  private Integer quantity;
 }
