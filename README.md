@@ -10,3 +10,5 @@ v0.0.1 init project
 v0.0.2 tests
 * [Testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-java/)
 для тестов 
+
+v0.0.3 order service
