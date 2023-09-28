@@ -37,23 +37,26 @@ public class OrderService {
         .map(OrderLineItems::getScuCode)
         .toList();
 
+    System.out.println("\n" + scuCodes + "\n");
+
     // Call inventory service, and place order if product is in
     // stock
     InventoryResponse[] inventoryResponses = webClient.get()
         .uri("http://localhost:8082/api/inventory",
-            uriBuilder -> uriBuilder.queryParam("scuCode", scuCodes).build())
+            uriBuilder ->
+                uriBuilder.queryParam("scuCode", scuCodes).build())
         .retrieve()
         .bodyToMono(InventoryResponse[].class)
         .block();
 
-    boolean allProductInStock = Arrays.stream(inventoryResponses).allMatch(InventoryResponse::isInStock);
+    boolean allProductInStock = Arrays.stream(inventoryResponses)
+        .allMatch(InventoryResponse::isInStock);
 
     if (Boolean.TRUE.equals(allProductInStock)) {
       orderRepository.save(order);
     } else {
       throw new IllegalArgumentException("Product is not in stock, please try again later");
     }
-
   }
 
   private OrderLineItems mapToDto(OrderLinesItemsDto orderLinesItemsDto) {
