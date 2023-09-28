@@ -49,6 +49,8 @@ public class OrderService {
         .bodyToMono(InventoryResponse[].class)
         .block();
 
+    System.out.println("\n" + Arrays.toString(inventoryResponses) + "\n");
+
     boolean allProductInStock = Arrays.stream(inventoryResponses)
         .allMatch(InventoryResponse::isInStock);
 
