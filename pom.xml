@@ -21,10 +21,12 @@
 		<module>product-service</module>
 		<module>order-service</module>
 		<module>inventory-service</module>
-	</modules>
+    <module>discovery-server</module>
+  </modules>
 
 	<properties>
 		<java.version>17</java.version>
+		<spring-cloud.version>2022.0.4</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -47,6 +49,26 @@
 		</dependency>
 
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>1.19.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
