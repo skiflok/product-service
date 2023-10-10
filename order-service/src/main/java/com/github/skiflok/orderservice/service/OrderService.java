@@ -7,9 +7,12 @@ import com.github.skiflok.orderservice.model.Order;
 import com.github.skiflok.orderservice.model.OrderLineItems;
 import com.github.skiflok.orderservice.repository.OrderRepository;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,10 +20,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Log4j2
 public class OrderService {
 
   private final OrderRepository orderRepository;
-  private final WebClient webClient;
+  private final WebClient.Builder webClientBuilder;
 
   public void placeOrder(OrderRequest orderRequest) {
     Order order = new Order();
@@ -37,12 +41,14 @@ public class OrderService {
         .map(OrderLineItems::getScuCode)
         .toList();
 
-    System.out.println("\n" + scuCodes + "\n");
+    log.info("scuCodes = {}",scuCodes);
+
+//    System.out.println("\n" + scuCodes + "\n");
 
     // Call inventory service, and place order if product is in
     // stock
-    InventoryResponse[] inventoryResponses = webClient.get()
-        .uri("http://localhost:8082/api/inventory",
+    InventoryResponse[] inventoryResponses = webClientBuilder.build().get()
+        .uri("http://inventory-service/api/inventory",
             uriBuilder ->
                 uriBuilder.queryParam("scuCode", scuCodes).build())
         .retrieve()
@@ -51,12 +57,18 @@ public class OrderService {
 
     System.out.println("\n" + Arrays.toString(inventoryResponses) + "\n");
 
-    boolean allProductInStock = Arrays.stream(inventoryResponses)
+    log.info("inventoryResponses = {}", (Object) inventoryResponses);
+
+    boolean allProductInStock = inventoryResponses != null && inventoryResponses.length != 0 && Arrays.stream(inventoryResponses)
         .allMatch(InventoryResponse::isInStock);
+
+    log.info("boolean allProductInStock = {}", allProductInStock);
 
     if (Boolean.TRUE.equals(allProductInStock)) {
       orderRepository.save(order);
+      log.info("orderRepository.save(order)");
     } else {
+      log.info("IllegalArgumentException");
       throw new IllegalArgumentException("Product is not in stock, please try again later");
     }
   }

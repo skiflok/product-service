@@ -22,9 +22,13 @@ public class OrderController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public String placeOrder(@RequestBody OrderRequest orderRequest){
-    log.info("orderRequest.toString()");
-    log.info(orderRequest.toString());
-    orderService.placeOrder(orderRequest);
+    try {
+      log.info("orderRequest.toString()");
+      log.info(orderRequest.toString());
+      orderService.placeOrder(orderRequest);
+    } catch (IllegalArgumentException e) {
+      return e.getMessage();
+    }
     return "Order Placed Successfully";
   }
 }
