@@ -34,7 +34,6 @@ v0.0.5 api-gateway
 * [ ] Standard flow
 * [ ] Direct access grants
 * Realm Setting -> openid-configuration
-*
 
 spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8181/realms/spring-boot-microservices-realm
 
