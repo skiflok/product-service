@@ -2,6 +2,7 @@ package com.github.skiflok.orderservice.controller;
 
 import com.github.skiflok.orderservice.dto.OrderRequest;
 import com.github.skiflok.orderservice.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class OrderController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @CircuitBreaker(name = "inventory", fallbackMethod = "failbackMethod")
   public String placeOrder(@RequestBody OrderRequest orderRequest){
     try {
       log.info("orderRequest.toString()");
@@ -31,4 +33,9 @@ public class OrderController {
     }
     return "Order Placed Successfully";
   }
+
+  public String failbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
+    return "Oops! Something wrong, please order after some time";
+  }
+
 }
