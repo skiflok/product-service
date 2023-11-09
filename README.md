@@ -152,3 +152,4 @@ Spring Cloud Circuit Breaker предоставляет абстрактный �
 http://localhost:8081/actuator
 http://localhost:8081/actuator/retryevents
 http://localhost:8081/actuator/timelimiterevents
+
