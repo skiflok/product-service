@@ -142,3 +142,13 @@ Spring Cloud Circuit Breaker предоставляет абстрактный �
 * http://localhost:8081/actuator/health
 * остановить серсис инвентаризации
 * сделать 5 запросов http://localhost:8080/api/order/
+* resilience4j.timelimiter.instances.inventory.timeout-duration=3s
+* устанавливает таймаут ожидание запроса
+* resilience4j.retry.instances.inventory.max-attempts=3
+* resilience4j.retry.instances.inventory.wait-duration=5s
+* устанавливает количество попыток ретрая запроса интервал
+
+проверить статистику
+http://localhost:8081/actuator
+http://localhost:8081/actuator/retryevents
+http://localhost:8081/actuator/timelimiterevents

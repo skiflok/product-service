@@ -3,6 +3,9 @@ package com.github.skiflok.orderservice.controller;
 import com.github.skiflok.orderservice.dto.OrderRequest;
 import com.github.skiflok.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,20 +25,23 @@ public class OrderController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @CircuitBreaker(name = "inventory", fallbackMethod = "failbackMethod")
-  public String placeOrder(@RequestBody OrderRequest orderRequest){
+  @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+  @TimeLimiter(name = "inventory")
+  @Retry(name = "inventory")
+  public CompletableFuture<String> placeOrder(@RequestBody OrderRequest orderRequest) {
     try {
       log.info("orderRequest.toString()");
       log.info(orderRequest.toString());
-      orderService.placeOrder(orderRequest);
+      return CompletableFuture.supplyAsync(() -> orderService.placeOrder(orderRequest));
     } catch (IllegalArgumentException e) {
-      return e.getMessage();
+      return CompletableFuture.supplyAsync(e::getMessage);
     }
-    return "Order Placed Successfully";
   }
 
-  public String failbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
-    return "Oops! Something wrong, please order after some time";
+  public CompletableFuture<String> fallbackMethod(OrderRequest orderRequest,
+      RuntimeException runtimeException) {
+    return CompletableFuture.supplyAsync(
+        () -> "Oops! Something wrong, please order after some time");
   }
 
 }
