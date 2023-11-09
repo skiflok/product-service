@@ -138,5 +138,7 @@ Spring Cloud Circuit Breaker предоставляет абстрактный �
 
 [Examples of resilience4j](https://resilience4j.readme.io/docs/getting-started-3)
 
-
-  6-14
+* для теста поднять ордер сервис на 8081
+* http://localhost:8081/actuator/health
+* остановить серсис инвентаризации
+* сделать 5 запросов http://localhost:8080/api/order/
