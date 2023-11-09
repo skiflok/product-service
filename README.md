@@ -153,3 +153,12 @@ http://localhost:8081/actuator
 http://localhost:8081/actuator/retryevents
 http://localhost:8081/actuator/timelimiterevents
 
+v0.0.7 Distributed Tracing Распределенная тарссировка
+
+[Spring Cloud Sleuth](https://spring.io/projects/spring-cloud-sleuth)
+
+[zipkin](https://zipkin.io/pages/quickstart.html)
+
+`docker run -d -p 9411:9411 openzipkin/zipkin`
+
+
