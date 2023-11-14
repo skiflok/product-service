@@ -16,43 +16,44 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${spring.security.user.name}")
-    String username;
+  @Value("${spring.security.user.name}")
+  String username;
 
-    @Value("${spring.security.user.password}")
-    String password;
+  @Value("${spring.security.user.password}")
+  String password;
 
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(
-                                "/**")
-                        .permitAll()
-                        .anyRequest().authenticated()
-                );
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests((requests) -> requests
+            .requestMatchers(
+                "/**",
+                "/zipkin/**")
+            .permitAll()
+//            .anyRequest().authenticated()
+        );
 //                .formLogin((form) -> form
 //                        .loginPage("/login")
 //                        .permitAll()
 //                )
 //                .logout(LogoutConfigurer::permitAll);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.withDefaultPasswordEncoder()
-                        .username(username)
-                        .password(password)
-                        .roles("USER")
-                        .build();
+  @Bean
+  public UserDetailsService userDetailsService() {
+    UserDetails user =
+        User.withDefaultPasswordEncoder()
+            .username(username)
+            .password(password)
+            .roles("USER")
+            .build();
 
-        return new InMemoryUserDetailsManager(user);
-    }
+    return new InMemoryUserDetailsManager(user);
+  }
 
 }
