@@ -3,6 +3,7 @@ package com.github.skiflok.orderservice.service;
 import com.github.skiflok.orderservice.dto.InventoryResponse;
 import com.github.skiflok.orderservice.dto.OrderLinesItemsDto;
 import com.github.skiflok.orderservice.dto.OrderRequest;
+import com.github.skiflok.orderservice.event.OrderPlacedEvent;
 import com.github.skiflok.orderservice.model.Order;
 import com.github.skiflok.orderservice.model.OrderLineItems;
 import com.github.skiflok.orderservice.repository.OrderRepository;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,6 +27,7 @@ public class OrderService {
 
   private final OrderRepository orderRepository;
   private final WebClient.Builder webClientBuilder;
+  private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
   public String placeOrder(OrderRequest orderRequest) {
     Order order = new Order();
@@ -41,7 +44,7 @@ public class OrderService {
         .map(OrderLineItems::getScuCode)
         .toList();
 
-    log.info("scuCodes = {}",scuCodes);
+    log.info("scuCodes = {}", scuCodes);
 
 //    System.out.println("\n" + scuCodes + "\n");
 
@@ -59,14 +62,17 @@ public class OrderService {
 
     log.info("inventoryResponses = {}", (Object) inventoryResponses);
 
-    boolean allProductInStock = inventoryResponses != null && inventoryResponses.length != 0 && Arrays.stream(inventoryResponses)
-        .allMatch(InventoryResponse::isInStock);
+    boolean allProductInStock =
+        inventoryResponses != null && inventoryResponses.length != 0 && Arrays.stream(
+                inventoryResponses)
+            .allMatch(InventoryResponse::isInStock);
 
     log.info("boolean allProductInStock = {}", allProductInStock);
 
     if (Boolean.TRUE.equals(allProductInStock)) {
       orderRepository.save(order);
       log.info("orderRepository.save(order)");
+      kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
       return "Order Placed Successfully";
     } else {
       log.info("IllegalArgumentException");

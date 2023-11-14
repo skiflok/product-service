@@ -161,3 +161,8 @@ v0.0.7 Distributed Tracing Распределенная тарссировка
 
 `docker run -d -p 9411:9411 openzipkin/zipkin`
 
+v0.0.8 Event Driven Architecture using Kafka
+
+[Apache Kafka® Quick Start](https://developer.confluent.io/quickstart/kafka-local/)
+
+[Быстрый старт для Confluent Platform](https://docs.confluent.io/platform/current/platform-quickstart.html#ce-docker-quickstart)
