@@ -166,3 +166,22 @@ v0.0.8 Event Driven Architecture using Kafka
 [Apache Kafka® Quick Start](https://developer.confluent.io/quickstart/kafka-local/)
 
 [Быстрый старт для Confluent Platform](https://docs.confluent.io/platform/current/platform-quickstart.html#ce-docker-quickstart)
+
+```properties
+#Kafka Properties
+spring.kafka.bootstrap-server=localhost:9092
+spring.kafka.template.default-topic=notificationTopic
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer
+spring.kafka.producer.properties.spring.json.type.mapping=event:com.github.skiflok.orderservice.event.OrderPlacedEvent
+```
+
+```properties
+#Kafka Properties
+spring.kafka.bootstrap-server=localhost:9092
+spring.kafka.template.default-topic=notificationTopic
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer
+spring.kafka.producer.properties.spring.json.type.mapping=event:com.github.skiflok.orderservice.event.OrderPlacedEvent
+```
+
