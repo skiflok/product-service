@@ -24,36 +24,43 @@ public class SecurityConfig {
 
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests((requests) -> requests
-            .requestMatchers(
-                "/**",
-                "/zipkin/**")
-            .permitAll()
-//            .anyRequest().authenticated()
-        );
-//                .formLogin((form) -> form
-//                        .loginPage("/login")
-//                        .permitAll()
-//                )
-//                .logout(LogoutConfigurer::permitAll);
-
-    return http.build();
+  public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    httpSecurity.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.ignoringRequestMatchers("/eureka/**"));
+    return httpSecurity.build();
   }
 
 
-  @Bean
-  public UserDetailsService userDetailsService() {
-    UserDetails user =
-        User.withDefaultPasswordEncoder()
-            .username(username)
-            .password(password)
-            .roles("USER")
-            .build();
+//  @Bean
+//  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//    http
+//        .csrf(AbstractHttpConfigurer::disable)
+//        .authorizeHttpRequests((requests) -> requests
+//            .requestMatchers(
+//                "/**",
+//                "/zipkin/**")
+//            .permitAll()
+////            .anyRequest().authenticated()
+//        );
+////                .formLogin((form) -> form
+////                        .loginPage("/login")
+////                        .permitAll()
+////                )
+////                .logout(LogoutConfigurer::permitAll);
+//
+//    return http.build();
+//  }
 
-    return new InMemoryUserDetailsManager(user);
-  }
+
+//  @Bean
+//  public UserDetailsService userDetailsService() {
+//    UserDetails user =
+//        User.withDefaultPasswordEncoder()
+//            .username(username)
+//            .password(password)
+//            .roles("USER")
+//            .build();
+//
+//    return new InMemoryUserDetailsManager(user);
+//  }
 
 }
