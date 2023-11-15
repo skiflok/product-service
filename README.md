@@ -185,3 +185,158 @@ spring.kafka.producer.value-serializer=org.springframework.kafka.support.seriali
 spring.kafka.producer.properties.spring.json.type.mapping=event:com.github.skiflok.orderservice.event.OrderPlacedEvent
 ```
 
+v0.0.9 Dockerized the application
+
+```dockerfile
+FROM openjdk:17
+
+COPY target/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+<details>
+<summary><strong>Описание работы докерфайла</strong></summary>
+
+Этот Dockerfile используется для создания Docker-образа для приложения на Java
+
+<p>Как это работает:</p>
+<ol>
+<li>
+FROM openjdk:17: Определяет базовый образ, который будет использован для создания нового образа. В данном случае используется образ с OpenJDK 17.
+</li>
+<li>
+COPY target/*.jar app.jar: Копирует все JAR-файлы из каталога target (предположительно, это каталог, где обычно собираются Java-приложения с использованием Maven или Gradle) внутрь контейнера и называет скопированный файл app.jar.
+</li>
+<li>
+ENTRYPOINT ["java", "-jar", "/app.jar"]: Устанавливает точку входа для контейнера. Когда контейнер будет запущен, он выполнит команду java -jar /app.jar, запуская тем самым Java-приложение из JAR-файла.
+</li>
+</ol>
+
+<p>
+Итак, этот Dockerfile создает контейнер, включающий в себя OpenJDK 17 и запускающий Java-приложение, указанное в app.jar с использованием команды java -jar.</p>
+
+</details>
+
+```shell
+cd api-gateway
+docker build -t api-gateway-dockerfile .
+```
+
+<details>
+<summary><strong>Описание</strong></summary>
+
+Команда docker build -t api-gateway-dockerfile . используется для построения Docker-образа с тегом api-gateway-dockerfile из текущего контекста сборки (текущего каталога, где находится Dockerfile).
+
+<p>Как это работает:</p>
+<ol>
+<li>
+docker build: Эта команда запускает процесс сборки Docker-образа.</li>
+<li>
+-t api-gateway-dockerfile: Опция -t используется для установки тега (имени) Docker-образа. В данном случае, тег установлен как api-gateway-dockerfile.</li>
+<li>
+.: Это означает текущий контекст сборки, то есть текущий рабочий каталог, где находится Dockerfile.</li>
+</ol>
+
+<p>
+Таким образом, после выполнения этой команды Docker будет использовать Dockerfile, который находится в текущем каталоге, для построения образа и присвоит ему тег api-gateway-dockerfile.
+</p>
+</details>
+
+[Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
+
+```dockerfile
+FROM eclipse-temurin:17.0.4.1_1-jdk as builder
+WORKDIR extracted
+ADD target/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+FROM eclipse-temurin:17.0.4.1_1-jre
+WORKDIR application
+COPY --from=builder extracted/dependencies/ ./
+COPY --from=builder extracted/spring-boot-loader/ ./
+COPY --from=builder extracted/snapshot-dependencies/ ./
+COPY --from=builder extracted/application/ ./
+EXPOSE 8080
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+```
+
+<details>
+<summary><strong>Описание</strong></summary>
+
+Этот Dockerfile используется для создания Docker-образа для приложения на основе Spring Boot
+
+<p>Как это работает:</p>
+<ol>
+<p>Первый этап (builder):</p>
+<li>
+FROM eclipse-temurin:17.0.4.1_1-jdk as builder: Этот этап использует образ JDK от Eclipse Temurin (ранее известного как AdoptOpenJDK) версии 17 как базовый образ и называет этот этап "builder".
+</li>
+<li>
+WORKDIR extracted: Устанавливает рабочий каталог внутри контейнера.
+</li>
+<li>
+ADD target/*.jar app.jar: Копирует все JAR-файлы из каталога "target" внутрь образа и называет их "app.jar".
+</li>
+
+<li>
+RUN java -Djarmode=layertools -jar app.jar extract: Выполняет команду для извлечения слоев JAR-файла. Это используется для разделения зависимостей, загрузчика Spring Boot и самого приложения в разные слои.
+</li>
+</ol>
+
+<p>Второй этап:</p>
+
+<ol>
+<p>Первый этап (builder):</p>
+<li>
+FROM eclipse-temurin:17.0.4.1_1-jre: Использует образ JRE от Eclipse Temurin (второй этап).
+</li>
+<li>
+WORKDIR application: Устанавливает рабочий каталог внутри контейнера.
+</li>
+<li>
+COPY --from=builder extracted/dependencies/ ./: Копирует зависимости из слоя "dependencies" внутрь контейнера.
+</li>
+
+<li>
+COPY --from=builder extracted/spring-boot-loader/ ./: Копирует загрузчик Spring Boot из слоя "spring-boot-loader".
+</li>
+
+<li>
+COPY --from=builder extracted/snapshot-dependencies/ ./: Копирует снимок зависимостей из слоя "snapshot-dependencies".
+</li>
+<li>
+COPY --from=builder extracted/application/ ./: Копирует само приложение из слоя "application".
+</li>
+
+<li>
+EXPOSE 8080: Объявляет, что контейнер будет слушать порт 8080 (это просто метаинформация и не приводит к автоматическому открытию порта).
+</li>
+
+<li>
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]: Задает точку входа для контейнера, указывая использовать загрузчик JAR Spring Boot.
+</li>
+
+</ol>
+
+<p>
+Этот Dockerfile использует два этапа сборки. Первый этап использует JDK для сборки и извлечения слоев JAR, а второй этап использует JRE и копирует извлеченные слои JAR, формируя таким образом более оптимизированный образ Docker.
+</p>
+</details>
+
+```shell
+cd api-gateway
+docker build -t api-gateway-layered -f Dockerfile.layered .
+```
+
+docker build используется для создания Docker-образа с именем api-gateway-layered
+из Dockerfile с именем Dockerfile.layered. 
+
+Опция -f позволяет указать путь к файлу Dockerfile.
+
+**главное не забыть создать собсбтвенно jar**
+
+[Building Java containers with Jib](https://cloud.google.com/java/getting-started/jib)
+
+setting.xml file - Users\<your username>\.m2\settings.xml
+
