@@ -338,5 +338,73 @@ docker build используется для создания Docker-образ�
 
 [Building Java containers with Jib](https://cloud.google.com/java/getting-started/jib)
 
+где лежит settings.xml
+
+
+
 setting.xml file - Users\<your username>\.m2\settings.xml
+
+`mvn clean compile jib:build`
+
+<details>
+<summary><strong>ошибка компиляции 401 Unauthorized</strong></summary>
+
+[ERROR] Failed to execute goal com.google.cloud.tools:jib-maven-plugin:3.3.2:build (default-cli) on project api-gateway: Build image failed, perhaps you should make sure your credentials for 'registry.hub.docker.com/skiflok/api-gateway' are set up correctly. See https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#what-should-i-do-when-the-registry-responds-with-unauthorized for help: Unauthorized for registry.hub.docker.com/skiflok/api-gateway: 401 Unauthorized
+
+</details>
+
+<details>
+<summary>Решение</summary>
+
+Для нахождения файла settings.xml на вашем компьютере, вы можете воспользоваться стандартным расположением по умолчанию. Вот некоторые общие места, где вы можете его найти:
+
+В домашнем каталоге пользователя: В большинстве случаев файл settings.xml располагается в подкаталоге .m2 в вашем домашнем каталоге. Например, для системы Linux путь может выглядеть так: /home/ваше_имя_пользователя/.m2/settings.xml, а для Windows: C:\Users\ваше_имя_пользователя\.m2\settings.xml.
+
+В инсталляции Maven: Файл settings.xml может также находиться в каталоге установки Maven, особенно если он был установлен вручную. Например, apache-maven-3.x.x/conf/settings.xml.
+
+В проекте: Ваш проект также может содержать файл settings.xml в своем корне. Однако это редкий случай, и большинство проектов используют глобальные настройки.
+
+Если ваши настройки Maven не отображаются в этих местах, вы можете попробовать выполнить команду Maven:
+
+bash
+Copy code
+mvn help:effective-settings
+Эта команда выведет эффективные настройки Maven, которые фактически используются при сборке проекта. В выводе будет упоминание о расположении файла settings.xml.
+
+Создайте файл settings.xml в каталоге ~/.m2/:
+
+bash
+Copy code
+nano ~/.m2/settings.xml
+Сохраните изменения и выйдите из редактора (например, в Nano это можно сделать, нажав Ctrl + X, затем подтвердив, что вы хотите сохранить изменения). После этого у вас должен появиться файл settings.xml в каталоге ~/.m2/. Этот файл будет использоваться Maven для конфигурации.
+
+</details>
+
+```xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <localRepository>/Users/violator/.m2/repository</localRepository>
+  <mirrors>
+    <mirror>
+      <mirrorOf>external:http:*</mirrorOf>
+      <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+      <url>http://0.0.0.0/</url>
+      <blocked>true</blocked>
+      <id>maven-default-http-blocker</id>
+    </mirror>
+  </mirrors>
+  <pluginGroups>
+    <pluginGroup>org.apache.maven.plugins</pluginGroup>
+    <pluginGroup>org.codehaus.mojo</pluginGroup>
+  </pluginGroups>
+  <servers>
+      <server>
+          <id>registry.hub.docker.com</id>
+          <username>username</username>
+          <password>password/</password>
+      </server>
+  </servers>
+</settings>
+
+```
+
 
