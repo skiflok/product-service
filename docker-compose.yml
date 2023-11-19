@@ -57,7 +57,7 @@ services:
 
   mongo-express:
     image: mongo-express
-    container_name: mongo-express
+    container_name: mongo-express-in-microservices
     #    restart: always
     ports:
       - "28081:8081"
@@ -97,6 +97,7 @@ services:
       - "8080:8080"
     volumes:
       - ./realms/:/opt/keycloak/data/import
+    depends_on:
       - keycloak-mysql
 
   zookeeper:
