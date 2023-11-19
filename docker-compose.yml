@@ -5,7 +5,7 @@ services:
   postgres-order:
     container_name: postgres-order
     image: postgres
-    entrypoint:
+    environment:
       POSTGRES_DB: order-service
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
