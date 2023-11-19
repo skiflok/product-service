@@ -7,7 +7,7 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: order-service
-      POSTGRES_USER: postgres
+#      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     volumes:
       - ./postgres-order:/data/postgres
@@ -24,7 +24,7 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: inventory-service
-      POSTGRES_USER: postgres
+#      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     volumes:
       - ./postgres-inventory:/data/postgres
